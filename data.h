@@ -11,18 +11,7 @@ namespace EvgeniDudnick {
 	private:
 		const int count = 25;
 		short maxElement;
-		bool pozitive;
-		void znach() {
-			int b = 0, c = 0;
-			for (int i = 0; i < 25; i++) {
-				if (vec[i] > 0){
-					b++;
-				}
-			}
-			if (b > 12) {
-				pozitive = true;
-			}
-		}
+		bool isPozitive;
 
 	protected:
 		std::vector<int> vec;
@@ -38,14 +27,28 @@ namespace EvgeniDudnick {
 			std::srand(seed);
 
 			vec.clear();
+			int temp = 0;
 			for (short i = 1; i < 13; i++) {
-				vec.push_back(rand() % 21 - 10);
+				do {
+					temp = rand() % 21 - 10;
+				} while (temp == 0);
+				vec.push_back(temp);
 			}
 			vec.push_back(userNum);
 			for (short i = 1; i < 12; i++) {
-				vec.push_back(rand() % 21 - 10);
+				do {
+					temp = rand() % 21 - 10;
+				} while (temp == 0);
+				vec.push_back(temp);
 			}
 			vec.push_back(userNum);
+			int pos = 0;
+			for (short i = 0; i < count; i++) {
+				if (vec[i] > 0) {
+					pos += 1;
+				}
+			}
+			isPozitive = (pos > 12) ? false : true;
 		}
 		System::String^ getVector() {
 			System::String^ vector;
@@ -69,7 +72,7 @@ namespace EvgeniDudnick {
 		Data() {
 			srand(time(NULL));
 			seed = 100000000 + rand() % (999999999 - 100000000 + 1);
-			userNum = 0;
+			userNum = 1;
 			activeSort = true;
 		}
 		System::String^ calc() {
@@ -81,7 +84,49 @@ namespace EvgeniDudnick {
 			calcText += getVector();
 
 			if (activeSort == true) {
+				calcText += "\r\nОтсортированый массив:\r\n";
+				short temp = 0;
+				if (isPozitive) {
+					for (short i = 0; i < count; i++) {
+						if (vec[i] < 0) {
+							for (short j = 0; j < count; j++) {
+								if (vec[j] > 0) {
+									int temp = vec[i];
+									vec[i] = vec[j];
+									vec[j] = temp;
+								}
+							}
+						}
+					}
+					for (short i = 0; i < count; i++) {
+						if (vec[i] > 0) {
+							temp = i;
+							break;
+						}
+					}
+				}
+				else {
+					for (short i = 0; i < count; i++) {
+						if (vec[i] > 0) {
+							for (short j = 0; j < count; j++) {
+								if (vec[j] < 0) {
+									int temp = vec[i];
+									vec[i] = vec[j];
+									vec[j] = temp;
+								}
+							}
+						}
+					}
+					for (short i = 0; i < count; i++) {
+						if (vec[i] < 0) {
+							temp = i;
+							break;
+						}
+					}
+				}
 
+				std::sort(vec.begin(), vec.begin() + temp);
+				calcText += getVector();
 			}
 
 			return calcText;
